@@ -9,11 +9,22 @@ import {
   ActivityIndicator,
 } from "react-native";
 import * as Location from "expo-location";
+import { Fontisto } from "@expo/vector-icons";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
 // 무료 API 키 이므로 프론트에 저장
 const API_KEY = "3c20122e229dc30247f7d70b2c3d6f41";
+
+const icons = {
+  Clouds: "cloudy",
+  Clear: "day-sunny",
+  Thunderstorm: "lightning",
+  Drizzle: "rain",
+  Rain: "rains",
+  Snow: "snow",
+  Atmosphere: "cloudy-qusts",
+};
 
 export default function App() {
   const [city, setCity] = useState("Loading...");
@@ -33,7 +44,7 @@ export default function App() {
       coords: { latitude, longitude },
     } = await Location.getCurrentPositionAsync({ accuracy: 5 }); // 정확도는 5
 
-    // 위도와 경도 이용해서 사용자의 위치정보 가져오기
+    // 위도와 경도 이용해서 사용자의 위치정보 가져오기 (Geocode와 반대)
     const location = await Location.reverseGeocodeAsync(
       { latitude, longitude },
       { useGoogleMaps: false }
@@ -66,7 +77,7 @@ export default function App() {
         contentContainerStyle={styles.weather}
       >
         {days.length === 0 ? (
-          <View style={styles.day}>
+          <View style={{ ...styles.day, alignItems: "center" }}>
             <ActivityIndicator
               color='white'
               size='large'
@@ -76,9 +87,23 @@ export default function App() {
         ) : (
           days.map((day, index) => (
             <View key={index} style={styles.day}>
-              <Text style={styles.temp}>
-                {parseFloat(day.temp.day).toFixed(1)}
-              </Text>
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  width: "100%",
+                  justifyContent: "space-around",
+                }}
+              >
+                <Text style={styles.temp}>
+                  {parseFloat(day.temp.day).toFixed(1)}
+                </Text>
+                <Fontisto
+                  name={icons[day.weather[0].main]}
+                  size={68}
+                  color='white'
+                />
+              </View>
               <Text style={styles.description}>{day.weather[0].main}</Text>
               <Text style={styles.tinyText}>{day.weather[0].description}</Text>
             </View>
@@ -100,24 +125,33 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   cityName: {
-    fontSize: 68,
+    fontSize: 60,
     fontWeight: "500",
+    color: "white",
   },
   weather: {},
   day: {
     width: SCREEN_WIDTH,
-    alignItems: "center",
+    alignItems: "flex-start",
+    paddingHorizontal: 20,
+    color: "white",
   },
   temp: {
     marginTop: 50,
-    fontSize: 178,
+    fontSize: 100,
+    fontWeight: "600",
+    color: "white",
   },
   description: {
-    margin: -20,
-    fontSize: 60,
+    marginTop: -10,
+    fontSize: 30,
+    fontWeight: "500",
+    color: "white",
   },
   tinyText: {
-    fontSize: 20,
-    marginTop: 10,
+    fontSize: 25,
+    marginTop: -5,
+    fontWeight: "500",
+    color: "white",
   },
 });
