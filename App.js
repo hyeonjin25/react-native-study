@@ -5,16 +5,20 @@ import {
   Text,
   View,
   TouchableOpacity,
-  TouchableHighlight,
-  TouchableWithoutFeedback,
+  TextInput,
 } from "react-native";
 import { theme } from "./colors";
 
 export default function App() {
   const [working, setWorking] = useState(true);
+  const [text, setText] = useState("");
 
   const onWorkPress = () => setWorking(true);
   const onTravelPress = () => setWorking(false);
+
+  const onchangeText = (payload) => {
+    setText(payload);
+  };
 
   return (
     <View style={styles.container}>
@@ -40,6 +44,18 @@ export default function App() {
           </Text>
         </TouchableOpacity>
       </View>
+      <View>
+        <TextInput
+          placeholder={
+            working ? "해야 할 일을 입력하세요" : "어디로 여행갈까요?"
+          }
+          // 엔터 버튼 바꾸기
+          onChangeText={onchangeText}
+          value={text}
+          returnKeyType='send'
+          style={styles.input}
+        />
+      </View>
     </View>
   );
 }
@@ -58,5 +74,13 @@ const styles = StyleSheet.create({
   btnText: {
     fontSize: 44,
     fontWeight: "600",
+  },
+  input: {
+    backgroundColor: "white",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 30,
+    marginTop: 20,
+    fontSize: 17,
   },
 });
