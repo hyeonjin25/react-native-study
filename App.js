@@ -1,15 +1,44 @@
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View } from "react-native";
+import React, { useState } from "react";
+import {
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+  TouchableHighlight,
+  TouchableWithoutFeedback,
+} from "react-native";
 import { theme } from "./colors";
 
 export default function App() {
+  const [working, setWorking] = useState(true);
+
+  const onWorkPress = () => setWorking(true);
+  const onTravelPress = () => setWorking(false);
+
   return (
     <View style={styles.container}>
       <Text>Open up App.js to start working on your app!</Text>
       <StatusBar style='auto' />
       <View style={styles.header}>
-        <Text style={styles.btnText}>Work</Text>
-        <Text style={styles.btnText}>Travel</Text>
+        {/* 누르는 이벤트를 listen, 투명도 조절가능 */}
+        <TouchableOpacity onPress={onWorkPress}>
+          <Text
+            style={{ ...styles.btnText, color: working ? "white" : theme.grey }}
+          >
+            Work
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={onTravelPress}>
+          <Text
+            style={{
+              ...styles.btnText,
+              color: !working ? "white" : theme.grey,
+            }}
+          >
+            Travel
+          </Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -29,6 +58,5 @@ const styles = StyleSheet.create({
   btnText: {
     fontSize: 44,
     fontWeight: "600",
-    color: theme.grey,
   },
 });
