@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   TextInput,
   ScrollView,
+  ActivityIndicator,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { theme } from "./colors";
@@ -41,10 +42,14 @@ export default function App() {
   };
 
   const loadToDos = async () => {
-    const s = await AsyncStorage.getItem(STORAGE_KEY, s);
+    try {
+      const s = await AsyncStorage.getItem(STORAGE_KEY, s);
+      // string을 object로 만들기
+      setToDos(JSON.parse(s));
+    } catch (e) {
+      console.log(e);
+    }
 
-    // string을 object로 만들기
-    setToDos(JSON.parse(s));
     console.log(JSON.parse(s));
   };
 
@@ -96,15 +101,21 @@ export default function App() {
           returnKeyType='done'
           style={styles.input}
         />
-        <ScrollView>
-          {Object.keys(toDos).map((key) =>
-            toDos[key].working === working ? (
-              <View style={styles.toDo} key={key}>
-                <Text style={styles.toDoText}>{toDos[key].text}</Text>
-              </View>
-            ) : null
-          )}
-        </ScrollView>
+        {toDos.length === 0 ? (
+          <View>
+            <ActivityIndicator style={{ marginTop: 50 }} />
+          </View>
+        ) : (
+          <ScrollView>
+            {Object.keys(toDos).map((key) =>
+              toDos[key].working === working ? (
+                <View style={styles.toDo} key={key}>
+                  <Text style={styles.toDoText}>{toDos[key].text}</Text>
+                </View>
+              ) : null
+            )}
+          </ScrollView>
+        )}
       </View>
     </View>
   );
