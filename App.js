@@ -11,13 +11,14 @@ import {
   Alert,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { MaterialIcons } from "@expo/vector-icons";
+import { MaterialIcons, AntDesign } from "@expo/vector-icons";
 import { theme } from "./colors";
 
 const STORAGE_KEY = "@toDos";
 
 export default function App() {
   const [working, setWorking] = useState(true);
+  const [finished, setFinished] = useState(false);
   const [text, setText] = useState("");
   const [toDos, setToDos] = useState({});
 
@@ -28,7 +29,7 @@ export default function App() {
       if (working !== null) setWorking(JSON.parse(working));
     }
     Category();
-    loadToDos(); 
+    loadToDos();
   }, []);
 
   const onWorkPress = async () => {
@@ -50,6 +51,7 @@ export default function App() {
       // asyncstorage에 저장하기 위해 object를 string으로 바꾸기
       const s = JSON.stringify(toSave);
       await AsyncStorage.setItem(STORAGE_KEY, s);
+      console.log(s);
     } catch (e) {
       console.log(e);
     }
@@ -72,10 +74,23 @@ export default function App() {
       return;
     }
     // save to do
-    const newToDo = { ...toDos, [Date.now()]: { text, working } };
+    const newToDo = { ...toDos, [Date.now()]: { text, working, finished } };
     setToDos(newToDo);
     await saveToDo(newToDo);
     setText("");
+  };
+
+  const onFinishedToDo = async (key) => {
+    const newToDos = { ...toDos };
+
+    // 이미 완료된 일이면 완료 취소/ 아니면 완료로 바꿔주기
+    if (toDos[key].finished) {
+      newToDos[key].finished = false;
+    } else {
+      newToDos[key].finished = true;
+    }
+    setToDos(newToDos);
+    saveToDo(newToDos);
   };
 
   const onDeleteToDo = async (key) => {
@@ -94,7 +109,6 @@ export default function App() {
         },
       },
     ]);
-    return;
   };
 
   return (
@@ -145,13 +159,53 @@ export default function App() {
           <ScrollView>
             {Object.keys(toDos).map((key) =>
               toDos[key].working === working ? (
-                <View style={styles.toDo} key={key}>
-                  <Text style={styles.toDoText}>{toDos[key].text}</Text>
-                  <TouchableOpacity onPress={() => onDeleteToDo(key)}>
-                    <Text>
-                      <MaterialIcons name='cancel' size={20} color={theme.bg} />
-                    </Text>
-                  </TouchableOpacity>
+                <View
+                  style={
+                    toDos[key].finished ? styles.toDoFinished : styles.toDo
+                  }
+                  key={key}
+                >
+                  <Text
+                    style={
+                      toDos[key].finished
+                        ? styles.toDoTextFinished
+                        : styles.toDoText
+                    }
+                  >
+                    {toDos[key].text}
+                  </Text>
+                  <View style={{ flexDirection: "row", alignItems: "center" }}>
+                    <TouchableOpacity
+                      onPress={() => onFinishedToDo(key)}
+                      style={{ paddingRight: 3 }}
+                    >
+                      <Text>
+                        {toDos[key].finished ? (
+                          <AntDesign
+                            name='checkcircle'
+                            size={20}
+                            color='black'
+                          />
+                        ) : (
+                          <AntDesign
+                            name='checkcircleo'
+                            size={20}
+                            color='black'
+                          />
+                        )}
+                      </Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity onPress={() => onDeleteToDo(key)}>
+                      <Text>
+                        <MaterialIcons
+                          name='cancel'
+                          size={24}
+                          color={theme.bg}
+                        />
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
                 </View>
               ) : null
             )}
@@ -195,9 +249,24 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
   },
+  toDoFinished: {
+    backgroundColor: "#242424",
+    marginBottom: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 15,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
   toDoText: {
     color: "white",
     fontSize: 16,
     fontWeight: "500",
+  },
+  toDoTextFinished: {
+    color: "gray",
+    fontSize: 16,
+    textDecorationLine: "line-through",
   },
 });
