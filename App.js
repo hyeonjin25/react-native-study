@@ -22,11 +22,23 @@ export default function App() {
   const [toDos, setToDos] = useState({});
 
   useEffect(() => {
-    loadToDos();
+    // useEffect에 async await 사용위해 함수 따로 만들기
+    async function Category() {
+      const working = await AsyncStorage.getItem("@working");
+      if (working !== null) setWorking(JSON.parse(working));
+    }
+    Category();
+    loadToDos(); 
   }, []);
 
-  const onWorkPress = () => setWorking(true);
-  const onTravelPress = () => setWorking(false);
+  const onWorkPress = async () => {
+    setWorking(true);
+    await AsyncStorage.setItem("@working", "true");
+  };
+  const onTravelPress = async () => {
+    setWorking(false);
+    await AsyncStorage.setItem("@working", "false");
+  };
 
   const onchangeText = (payload) => {
     setText(payload);
@@ -137,11 +149,7 @@ export default function App() {
                   <Text style={styles.toDoText}>{toDos[key].text}</Text>
                   <TouchableOpacity onPress={() => onDeleteToDo(key)}>
                     <Text>
-                      <MaterialIcons
-                        name='cancel'
-                        size={20}
-                        color={theme.bg}
-                      />
+                      <MaterialIcons name='cancel' size={20} color={theme.bg} />
                     </Text>
                   </TouchableOpacity>
                 </View>
