@@ -8,8 +8,10 @@ import {
   TextInput,
   ScrollView,
   ActivityIndicator,
+  Alert,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { MaterialIcons } from "@expo/vector-icons";
 import { theme } from "./colors";
 
 const STORAGE_KEY = "@toDos";
@@ -64,6 +66,25 @@ export default function App() {
     setText("");
   };
 
+  const onDeleteToDo = async (key) => {
+    Alert.alert("ToDo를 삭제합니다.", "삭제하시겠습니까?", [
+      { text: "아니오" },
+      {
+        text: "예",
+        // 강조하기
+        style: "destructive",
+        onPress: () => {
+          const newToDos = { ...toDos };
+          // 해당 키의 object 지워주기
+          delete newToDos[key];
+          setToDos(newToDos);
+          saveToDo(newToDos);
+        },
+      },
+    ]);
+    return;
+  };
+
   return (
     <View style={styles.container}>
       <Text>Open up App.js to start working on your app!</Text>
@@ -101,16 +122,28 @@ export default function App() {
           returnKeyType='done'
           style={styles.input}
         />
+
+        {/* 로딩중인 경우 */}
         {toDos.length === 0 ? (
           <View>
             <ActivityIndicator style={{ marginTop: 50 }} />
           </View>
         ) : (
+          // 사용자가 저장한 리스트
           <ScrollView>
             {Object.keys(toDos).map((key) =>
               toDos[key].working === working ? (
                 <View style={styles.toDo} key={key}>
                   <Text style={styles.toDoText}>{toDos[key].text}</Text>
+                  <TouchableOpacity onPress={() => onDeleteToDo(key)}>
+                    <Text>
+                      <MaterialIcons
+                        name='cancel'
+                        size={20}
+                        color={theme.bg}
+                      />
+                    </Text>
+                  </TouchableOpacity>
                 </View>
               ) : null
             )}
@@ -150,6 +183,9 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 15,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
   toDoText: {
     color: "white",
