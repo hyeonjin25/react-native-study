@@ -11,7 +11,7 @@ import {
   Alert,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { MaterialIcons, AntDesign } from "@expo/vector-icons";
+import { MaterialIcons, AntDesign, Entypo } from "@expo/vector-icons";
 import { theme } from "./colors";
 
 const STORAGE_KEY = "@toDos";
@@ -19,7 +19,9 @@ const STORAGE_KEY = "@toDos";
 export default function App() {
   const [working, setWorking] = useState(true);
   const [finished, setFinished] = useState(false);
-  const [text, setText] = useState("");
+  const [modifying, setModifying] = useState(false);
+  const [text, onchangeText] = useState("");
+  const [modiText, onchangeModiText] = useState("");
   const [toDos, setToDos] = useState({});
 
   useEffect(() => {
@@ -39,10 +41,6 @@ export default function App() {
   const onTravelPress = async () => {
     setWorking(false);
     await AsyncStorage.setItem("@working", "false");
-  };
-
-  const onchangeText = (payload) => {
-    setText(payload);
   };
 
   const saveToDo = async (toSave) => {
@@ -77,7 +75,22 @@ export default function App() {
     const newToDo = { ...toDos, [Date.now()]: { text, working, finished } };
     setToDos(newToDo);
     await saveToDo(newToDo);
-    setText("");
+    onchangeModiText("");
+  };
+
+  const modifyToDo = async (key) => {
+    if (modiText === "") {
+      return;
+    }
+    // save to do
+    const newToDo = {
+      ...toDos,
+      [key]: { text: modiText, working, finished, modifying },
+    };
+    setToDos(newToDo);
+    await saveToDo(newToDo);
+    setModifying(false);
+    onchangeModiText("");
   };
 
   const onFinishedToDo = async (key) => {
@@ -88,6 +101,19 @@ export default function App() {
       newToDos[key].finished = false;
     } else {
       newToDos[key].finished = true;
+    }
+    setToDos(newToDos);
+    saveToDo(newToDos);
+  };
+
+  const onModifyToDo = async (key) => {
+    const newToDos = { ...toDos };
+
+    // 이미 완료된 일이면 완료 취소/ 아니면 완료로 바꿔주기
+    if (toDos[key].modifying) {
+      newToDos[key].modifying = false;
+    } else {
+      newToDos[key].modifying = true;
     }
     setToDos(newToDos);
     saveToDo(newToDos);
@@ -155,7 +181,7 @@ export default function App() {
             <ActivityIndicator style={{ marginTop: 50 }} />
           </View>
         ) : (
-          // 사용자가 저장한 리스트
+          // 사용자가 저장한 리스트 보여주기
           <ScrollView>
             {Object.keys(toDos).map((key) =>
               toDos[key].working === working ? (
@@ -165,16 +191,41 @@ export default function App() {
                   }
                   key={key}
                 >
-                  <Text
-                    style={
-                      toDos[key].finished
-                        ? styles.toDoTextFinished
-                        : styles.toDoText
-                    }
-                  >
-                    {toDos[key].text}
-                  </Text>
+                  {toDos[key].modifying ? (
+                    // 수정할 때
+                    <TextInput
+                      onSubmitEditing={() => modifyToDo(key)}
+                      placeholder={toDos[key].text}
+                      onChangeText={onchangeModiText}
+                      value={modiText}
+                      returnKeyType='done'
+                      autoFocus={true}
+                      style={{
+                        backgroundColor: "white",
+                        padding: 5,
+                        width: "70%",
+                      }}
+                    />
+                  ) : (
+                    <Text
+                      style={
+                        toDos[key].finished
+                          ? styles.toDoTextFinished
+                          : styles.toDoText
+                      }
+                    >
+                      {toDos[key].text}
+                    </Text>
+                  )}
                   <View style={{ flexDirection: "row", alignItems: "center" }}>
+                    {/* 수정 버튼 */}
+                    <TouchableOpacity onPress={() => onModifyToDo(key)}>
+                      <Text>
+                        <Entypo name='pencil' size={22} color='black' />
+                      </Text>
+                    </TouchableOpacity>
+
+                    {/* 완료 버튼 */}
                     <TouchableOpacity
                       onPress={() => onFinishedToDo(key)}
                       style={{ paddingRight: 3 }}
@@ -196,6 +247,7 @@ export default function App() {
                       </Text>
                     </TouchableOpacity>
 
+                    {/* 삭제 버튼 */}
                     <TouchableOpacity onPress={() => onDeleteToDo(key)}>
                       <Text>
                         <MaterialIcons
