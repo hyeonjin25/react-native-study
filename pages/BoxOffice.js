@@ -2,6 +2,9 @@ import React from 'react';
 import {ActivityIndicator} from 'react-native';
 import styled from 'styled-components/native';
 import axios from 'axios';
+import Title from '../components/Title';
+import ListItem from '../components/ListItem';
+import MovieName from '../components/MovieName';
 
 const Container = styled.SafeAreaView`
   flex: 1;
@@ -12,28 +15,10 @@ const Contents = styled.ScrollView`
   flex: 1;
 `;
 
-const Title = styled.Text`
-  font-size: 24px;
-  font-weight: bold;
-`;
-
-const ListItem = styled.TouchableOpacity`
-  padding: 12px;
-  border-bottom-color: #e5e5e5;
-  border-bottom-width: 1px;
-  flex-direction: row;
-  align-items: center;
-`;
-
 const Rank = styled.Text`
   font-size: 14px;
   color: #999999;
   margin-right: 12px;
-`;
-
-const MovieName = styled.Text`
-  font-size: 18px;
-  font-weight: bold;
 `;
 
 function BoxOffice(props) {
