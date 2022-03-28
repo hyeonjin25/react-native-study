@@ -63,7 +63,11 @@ function BoxOffice(props) {
         {/* 로딩중일 경우 */}
         {list.length === 0 && <ActivityIndicator size="large" />}
         {list.map(item => (
-          <ListItem key={item.movieCd}>
+          <ListItem
+            key={item.movieCd}
+            onPress={() => {
+              props.navigation.navigate('MovieDetail', {movieCd: item.movieCd});
+            }}>
             {/*  영화 코드*/}
             <Rank>{item.rank}</Rank>
             <MovieName>{item.movieNm}</MovieName>
