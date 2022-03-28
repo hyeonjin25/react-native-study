@@ -53,7 +53,7 @@ function MovieDetail(props) {
 
   React.useEffect(() => {
     let url =
-      'http://www.kobis.or.kr/kobisopenapi/webservice/rest/movie/searchMovieInfo.json?key=1cf8e916611871e613ebe31e4c98756a';
+      'https://www.kobis.or.kr/kobisopenapi/webservice/rest/movie/searchMovieInfo.json?key=1cf8e916611871e613ebe31e4c98756a';
     url += '&movieCd=' + props.route.params.movieCd;
     axios
       .get(url)
