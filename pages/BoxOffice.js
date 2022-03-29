@@ -5,6 +5,7 @@ import axios from 'axios';
 import Title from '../components/Title';
 import ListItem from '../components/ListItem';
 import MovieName from '../components/MovieName';
+import fetch from '../net/fetch';
 
 const Container = styled.SafeAreaView`
   flex: 1;
@@ -27,17 +28,17 @@ function BoxOffice(props) {
   React.useEffect(() => {
     // 영화 정보 가져오기
     // ajax 비동기 자바스크립트 XML
-    axios
-      .get(
-        'https://www.kobis.or.kr/kobisopenapi/webservice/rest/boxoffice/searchDailyBoxOfficeList.json?key=1cf8e916611871e613ebe31e4c98756a&targetDt=20220222',
-      )
-      .then(res => {
+    fetch(
+      'https://www.kobis.or.kr/kobisopenapi/webservice/rest/boxoffice/searchDailyBoxOfficeList.json?key=1cf8e916611871e613ebe31e4c98756a&targetDt=20220328',
+    )
+      .then(data => {
         // 완료 되었을 때
-        setList(res.data.boxOfficeResult.dailyBoxOfficeList);
-        console.log(res.data.boxOfficeResult.dailyBoxOfficeList);
+        setList(data.boxOfficeResult.dailyBoxOfficeList);
+        console.log(data.boxOfficeResult.dailyBoxOfficeList);
       })
       .catch(err => {
         // 예외가 발생했을 때
+        alert(err.message);
       });
   }, []);
 

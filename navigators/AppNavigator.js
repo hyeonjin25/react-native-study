@@ -12,12 +12,12 @@ function AppNavigator() {
       <Drawer.Screen
         name="BoxOfficeNavigator"
         component={BoxOfficeNavigator}
-        options={{drawerLabel: '박스오피스'}}
+        options={{drawerLabel: '박스오피스', title: ''}}
       />
       <Drawer.Screen
         name="SearchNavigator"
         component={SearchNavigator}
-        options={{drawerLabel: '영화검색'}}
+        options={{drawerLabel: '영화검색', title: ''}}
       />
     </Drawer.Navigator>
   );

@@ -3,6 +3,7 @@ import styled from 'styled-components/native';
 import axios from 'axios';
 import {ActivityIndicator} from 'react-native';
 import moment from 'moment';
+import fetch from '../net/fetch';
 
 const Container = styled.SafeAreaView`
   flex: 1;
@@ -55,11 +56,9 @@ function MovieDetail(props) {
     let url =
       'https://www.kobis.or.kr/kobisopenapi/webservice/rest/movie/searchMovieInfo.json?key=1cf8e916611871e613ebe31e4c98756a';
     url += '&movieCd=' + props.route.params.movieCd;
-    axios
-      .get(url)
-      .then(res => {
-        console.log(res);
-        setInfo(res.data.movieInfoResult.movieInfo);
+    fetch(url)
+      .then(data => {
+        setInfo(data.movieInfoResult.movieInfo);
       })
       .catch(err => {
         alert(err.message);
